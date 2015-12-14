@@ -24,14 +24,14 @@
 
         	.tabel-puzzle td {
         		border: 1px solid #ddd;
-        		width: 70px;
+        		width: 75px;
         		height: 70px;
         	}
 
         	.input-puzzle{
-        		width: 55px;
+        		width: 60px;
         		margin: auto;
-        		font-size: 80%
+        		font-size: inherit;
         	}
         	.tabel-puzzle td:hover{
         		background-color: #fcf8e3;
@@ -47,7 +47,7 @@
 			    background: url('images/processing.gif') 50% 50% no-repeat rgb(249,249,249);
 			}
 			.container-puzlle-result{
-				width: 200px;
+				width: 225px;
 				display: inline-block;
 				float: left;
 			}
@@ -473,16 +473,8 @@
 				}
 				n_state = swap(n_state, zero_idx,new_zero );
 				return n_state;
-
-			}
-
-			function sample()
-			{
-				console.log('sample sample');
-
 			}
 
 		</script>
-
     </body>
 </html>

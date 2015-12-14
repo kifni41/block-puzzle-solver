@@ -163,7 +163,41 @@ function action(puzzle,dir,zero_idx)
 {
 	//console.log(puzzle);
 	//console.log('#'+dir);
-	n_state = puzzle.state.slice();
+	//n_state = puzzle.state.slice();
+	// mod = zero_idx % 3;
+	// div = parseInt(zero_idx/3);
+	//console.log('#mod='+mod+'#div='+div);
+	// if(dir == 'left' && mod != 0){
+	// 	new_zero = zero_idx - 1;
+	// }
+	// else if(dir == 'right' && mod !=2){
+	// 	new_zero = zero_idx + 1;
+	// }
+	// else if(dir == 'up' && div !=0){
+	// 	new_zero = zero_idx - 3;
+	// }
+	// else if(dir == 'down' && div !=2){
+	// 	new_zero = zero_idx + 3;
+	// }else{
+	// 	return null;
+	// }
+	// n_state = swap(n_state, zero_idx,new_zero );
+	n_state = moveState(puzzle.state, dir);
+	if(n_state){
+		n_path = puzzle.path +"#"+dir;
+		n_puzzle = new Puzzle(n_state, n_path);
+		//console.log(n_puzzle);
+		return n_puzzle;
+	}else{
+		return null;
+	}
+
+}
+
+function moveState(state, dir)
+{
+	var zero_idx = state.indexOf(0);
+	n_state = state.slice();
 	mod = zero_idx % 3;
 	div = parseInt(zero_idx/3);
 	//console.log('#mod='+mod+'#div='+div);
@@ -182,10 +216,7 @@ function action(puzzle,dir,zero_idx)
 		return null;
 	}
 	n_state = swap(n_state, zero_idx,new_zero );
-	n_path = puzzle.path +"#"+dir;
-	n_puzzle = new Puzzle(n_state, n_path);
-	//console.log(n_puzzle);
-	return n_puzzle;
+	return n_state;
 }
 
 function swap(p_state, old_zero, new_zero)
@@ -244,18 +275,18 @@ PriorityQueue.prototype = {
     }   },
         
     // does the opposite of the bubble() function
-    sink: function(i) {
-        while (i*2 < this.heap.length) {
-            // if equal, left bubbles (maintains insertion order)
-            var leftHigher = !this.isHigherPriority(i*2 +1, i*2);
-            var childIndex = leftHigher? i*2 : i*2 +1;
+    // sink: function(i) {
+    //     while (i*2 < this.heap.length) {
+    //         // if equal, left bubbles (maintains insertion order)
+    //         var leftHigher = !this.isHigherPriority(i*2 +1, i*2);
+    //         var childIndex = leftHigher? i*2 : i*2 +1;
             
-            // if equal, sink happens (maintains insertion order)
-            if (this.isHigherPriority(i,childIndex)) break;
+    //         // if equal, sink happens (maintains insertion order)
+    //         if (this.isHigherPriority(i,childIndex)) break;
             
-            this.swap(i, childIndex);
-            i = childIndex;
-    }   },
+    //         this.swap(i, childIndex);
+    //         i = childIndex;
+    // }   },
         
     // swaps the addresses of 2 nodes
     swap: function(i,j) {
