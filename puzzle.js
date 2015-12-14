@@ -3,48 +3,41 @@
 * Author : Kifni Taufik D <kifnitaufik.gmail.com>
 */
 
-function Puzzle(state, zero_idx, path, parent){
+function Puzzle(state, path){
 	this.state = state;
-	this.zero_idx = zero_idx;
 	this.path = path;
-	this.parent = parent;
 }
 
-
-function solve_ucs (initial_state, goal_state) {
+function solveBFS (initial_state, goal_state) {
 	var start = new Date().getTime();
-	console.log('lets solve this puzzle : ucs');
+	console.log('Lets solve this puzzle : BFS');
 	console.log('initial = ' +initial_state);
 	console.log('goal = ' +goal_state);
 	//check if initial state = goal state, no need to solve !
 	if(initial_state.toString() === goal_state.toString())
 	{
-		console.log('already solved dude!!');
+		var data = {
+			'success'	: 0,
+			'message' 	: "Already Solved! Initial State = Goal !"
+		};
 	}
 	else{
 		var found = -1;
 		var moves = [];
 		//put first state to moves
 
-		var initial = new Puzzle(initial_state.slice(),initial_state.indexOf(0),"",null);
+		var initial = new Puzzle(initial_state.slice(),"");
 		moves.push(initial);
-		var queue = new PriorityQueue();
-		queue.pushe(0,0);
+		var queue = [0];
 		var visited = [initial_state.toString()];
-		var idx = 0;
 		var directions = ['left','right','up','down'];
 
-		console.log(moves);
-
 		while(found == -1){
-			current_index =queue.pope();
-			idx++;
-			//console.log(idx);
-			//console.log(moves[current_index]);
-			//console.log(visited);
+			current_index =queue.shift();
+			var zero_idx = moves[current_index].state.indexOf(0);
 			for (var i = 0; i < directions.length; i++) {
 				//console.log('#'+directions[i]);
-				new_puzzle = action(moves[current_index],directions[i]);
+				new_puzzle = action(moves[current_index],directions[i],zero_idx);
 				if(new_puzzle != null && visited.indexOf(new_puzzle.state.toString()) == -1 ){
 					visited.push(new_puzzle.state.toString());
 					new_puzzle.parent = current_index;
@@ -52,56 +45,145 @@ function solve_ucs (initial_state, goal_state) {
 					if(new_puzzle.state.toString() === goal_state.toString()){
 						found = moves.length-1;
 					}else{
-						queue.pushe(moves.length-1,idx);
+						queue.push(moves.length-1);
 					}
-
-
 				}
 			};
-			// if(idx == 100){
-			// 	found = "nyerah";
-			// 	break;
-			// }
+			//break;
 		}
-		//console.log(visited);
 		var end = new Date().getTime();
 		var time = end - start;
-		console.log('Execution time: ' + (time/1000) +'seconds');
-		console.log('visited = '+visited.length);
-		console.log('moves = ' +moves.length);
-		console.log('found = ' +found);
-		console.log(moves[found]);
 
+		var solution = moves[found].path.split('#');
+		solution.shift(); //remove the first empty array
 
+		var data = {
+			'success'	: 1,
+			'message' 	: "Puzzle Solved !",
+			'time'		: (time/1000),
+			'visited'	: moves.length,
+			'solution'	: solution
+		};
 	}
+
+	return data;
 }
 
-function action(puzzle,dir)
+function solveAStar(initial_state, goal_state) {
+	var start = new Date().getTime();
+	//console.log('Lets solve this puzzle : A*');
+	//console.log('initial = ' +initial_state);
+	//console.log('goal = ' +goal_state);
+	//check if initial state = goal state, no need to solve !
+	if(initial_state.toString() == goal_state.toString())
+	{
+		var data = {
+			'success'	: 0,
+			'message' 	: "Already Solved! Initial State = Goal !"
+		};
+	}
+	else{
+		var found = -1;
+		var moves = [];
+		//put first state to moves
+
+		var initial = new Puzzle(initial_state.slice(),"");
+		moves.push(initial);
+		var queue = new PriorityQueue();
+		queue.pushe(0,0);
+		var visited = [initial_state.toString()];
+		var idx = 0;
+		var directions = ['left','right','up','down'];
+
+		while(found == -1){
+			current_index =queue.pope();
+			idx++;
+			var zero_idx = moves[current_index].state.indexOf(0);
+			for (var i = 0; i < directions.length; i++) {
+				//console.log('#'+directions[i]);
+				new_puzzle = action(moves[current_index],directions[i],zero_idx);
+				if(new_puzzle != null && visited.indexOf(new_puzzle.state.toString()) == -1 ){
+					visited.push(new_puzzle.state.toString());
+					new_puzzle.parent = current_index;
+					moves.push(new_puzzle);
+					if(new_puzzle.state.toString() == goal_state.toString()){
+						found = moves.length-1;
+					}else{
+						//cost = step to current state + distance from state to goal
+						var cost = idx + distanceToGoal(new_puzzle.state,goal_state) ;
+						queue.pushe(moves.length-1,cost);
+					}
+				}
+			};
+			//break;
+		}
+		var end = new Date().getTime();
+		var time = end - start;
+
+		var solution = moves[found].path.split('#');
+		solution.shift(); //remove the first empty array
+		var data = {
+			'success'	: 1,
+			'message' 	: "Puzzle Solved !",
+			'time'		: (time/1000),
+			'visited'	: moves.length,
+			'solution'	: solution
+		};
+	}
+	return data;
+}
+
+function distanceToGoal(state, goal_state)
+{
+	// console.log('distanceToGoal...');
+	// console.log(state);
+	// console.log(goal_state);
+	var distance =0;
+	var zipped = state.map(function (e, i) {
+		   			return [state[i], goal_state[i]];
+				});
+	for (var i = 0; i < zipped.length; i++) {
+		// console.log(zipped[i]);
+		// console.log(zipped[i][0]%3);
+		// console.log(parseInt(zipped[i][0]/3));
+		// console.log(zipped[i][1]%3);
+		// console.log(parseInt(zipped[i][1]/3));
+		// console.log('manhattan='+manhattanDistance( (zipped[i][0]%3), (parseInt(zipped[i][0]/3)) , (zipped[i][1]%3) , (parseInt(zipped[i][1]/3)) ));
+		distance +=manhattanDistance( (zipped[i][0]%3), (parseInt(zipped[i][0]/3)) , (zipped[i][1]%3) , (parseInt(zipped[i][1]/3)) );
+	};
+	//console.log('total distance = '+distance);
+	return distance;
+}
+
+function manhattanDistance (x1, y1, x2, y2) {
+	return Math.abs(x1 - x2) + Math.abs(y1 -y2);
+}
+
+function action(puzzle,dir,zero_idx)
 {
 	//console.log(puzzle);
 	//console.log('#'+dir);
 	n_state = puzzle.state.slice();
-	//n_path = puzzle.path.slice();
-	mod = puzzle.zero_idx % 3;
-	div = parseInt(puzzle.zero_idx/3);
+	mod = zero_idx % 3;
+	div = parseInt(zero_idx/3);
 	//console.log('#mod='+mod+'#div='+div);
 	if(dir == 'left' && mod != 0){
-		new_zero = puzzle.zero_idx - 1;
+		new_zero = zero_idx - 1;
 	}
 	else if(dir == 'right' && mod !=2){
-		new_zero = puzzle.zero_idx + 1;
+		new_zero = zero_idx + 1;
 	}
 	else if(dir == 'up' && div !=0){
-		new_zero = puzzle.zero_idx - 3;
+		new_zero = zero_idx - 3;
 	}
 	else if(dir == 'down' && div !=2){
-		new_zero = puzzle.zero_idx + 3;
+		new_zero = zero_idx + 3;
 	}else{
 		return null;
 	}
-	n_state = swap(n_state, puzzle.zero_idx,new_zero );
-	//n_path.push(dir);
-	n_puzzle = new Puzzle(n_state,new_zero, puzzle.path+"|"+dir, null);
+	n_state = swap(n_state, zero_idx,new_zero );
+	n_path = puzzle.path +"#"+dir;
+	n_puzzle = new Puzzle(n_state, n_path);
 	//console.log(n_puzzle);
 	return n_puzzle;
 }
@@ -110,73 +192,14 @@ function swap(p_state, old_zero, new_zero)
 {
 	p_state[old_zero] = p_state[new_zero];
 	p_state[new_zero] = 0;
-
 	return p_state;
-}
-//swap blank box to right
-function swap_right(state)
-{
-	var r_state = state.slice();
-	null_index = r_state.indexOf(0);
-	//only possible on left & middle (horizontal)
-	if(null_index != 2 && null_index != 5 && null_index !=8){
-		r_state[null_index] = r_state[null_index+1];
-		r_state[null_index+1] = 0;
-		return r_state;
-	}else{
-		return null;
-	}
-}
-
-//swap blank box to left
-function swap_left(state)
-{
-	var l_state = state.slice();
-	null_index = l_state.indexOf(0);
-	//swap right only possible on right & middle (horizontal)
-	if(null_index != 0 && null_index != 3 && null_index !=6){
-		l_state[null_index] = l_state[null_index-1];
-		l_state[null_index-1] = 0;
-		return l_state;
-	}else{
-		return null;
-	}
-}
-
-//swap blank box to up side
-function swap_up(state)
-{
-	var u_state = state.slice();
-	null_index = u_state.indexOf(0);
-	//only possible on bottom & middle (vertical)
-	if(null_index != 0 && null_index != 1 && null_index !=2){
-		u_state[null_index] = u_state[null_index-3];
-		u_state[null_index-3] = 0;
-		return u_state;
-	}else{
-		return null;
-	}
-}
-
-//swap blank box to down side
-function swap_down(state)
-{
-	var d_state = state.slice();
-	null_index = d_state.indexOf(0);
-	//only possible on top & middle (vertical)
-	if(null_index != 6 && null_index != 7 && null_index !=8){
-		d_state[null_index] = d_state[null_index+3];
-		d_state[null_index+3] = 0;
-		return d_state;
-	}else{
-		return null;
-	}
 }
 
 /*
 * PRIORITY QUEUE
-* Author : janogonzalez
-* https://github.com/janogonzalez/priorityqueuejs
+* Author : GRIFFnDOOR
+* https://jsfiddle.net/GRIFFnDOOR/r7tvg/
+* modified by : Kifni Taufik Darmawan
 */
 
 function Node (data, priority) {
@@ -200,12 +223,7 @@ PriorityQueue.prototype = {
     
     // removes and returns the data of highest priority
     pope: function() {
-    	// console.log('pop');
-    	// var aa = this.heap.slice();
-    	// console.log('heap_length='+aa.length);
-    	// console.log(aa);
         var topVal = this.heap[1].data;
-        //console.log('topVal='+topVal);
         //this.heap[1] = this.heap.pop();
         //this.sink(1); 
         this.heap.splice(1,1);

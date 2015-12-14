@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="Solving  8 Block Puzzle">
+        <meta name="author" content="Kifni Taufik Darmawan">
+        <title>Solving 8 Block Puzzle With A*</title>
+        <!-- CSS -->
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/ie10-viewport-bug-workaround.css" rel="stylesheet">
+        <link href="css/jumbotron-narrow.css" rel="stylesheet">
+        <!-- JS -->
+        <script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
+        <script type="text/javascript" src="puzzle.js"></script>
+
+        <style type="text/css">
+        	.tabel-puzzle{
+        		border: 1px solid #ddd;
+        		margin: auto;
+        	}
+
+        	.tabel-puzzle td {
+        		border: 1px solid #ddd;
+        		width: 70px;
+        		height: 70px;
+        	}
+
+        	.input-puzzle{
+        		width: 55px;
+        		margin: auto;
+        		font-size: 80%
+        	}
+        	.tabel-puzzle td:hover{
+        		background-color: #fcf8e3;
+        	}
+			.loader {
+			    position: fixed;
+			    left: 0px;
+			    top: 0px;
+			    width: 100%;
+			    height: 100%;
+			    z-index: 9999;
+			    opacity: 0.9;
+			    background: url('images/processing.gif') 50% 50% no-repeat rgb(249,249,249);
+			}
+			.container-puzlle-result{
+				width: 200px;
+				display: inline-block;
+				float: left;
+			}
+        	.tabel-puzzle-result{
+        		border: 1px solid #ddd;
+        		margin: auto;
+        	}
+
+        	.tabel-puzzle-result td {
+        		border: 1px solid #ddd;
+        		width: 50px;
+        		height: 50px;
+        	}
+        	.tabel-puzzle-result td:hover{
+        		background-color: #fcf8e3;
+        	}
+        </style>
+    </head>
+    <body>
+    	<div class="loader"></div>
+        <div class="container">
+            <div class="header clearfix">
+	            <nav>
+	            <ul class="nav nav-pills pull-right">
+	            <li role="presentation"><a href="index.html">Home</a></li>
+	            <li role="presentation"  class="active"><a href="about.html">About</a></li>
+	            <li role="presentation"><a href="http://kifni.com">Contact</a></li>
+	            </ul>
+	            </nav>
+	            <h3 class="text-muted">Block Puzzle Solver</h3>
+            </div>
+            <div class="row" style="text-align:center">
+            Hello there...
+            </div>
+
+            <footer class="footer" style="margin-top:10px;">
+                <p>2015 <a href="http://kifni.com">Kifni Taufik Darmawan</a></p>
+            </footer>
+        </div> <!-- /container -->
+        <script type="text/javascript">
+			$(function(){
+				$(".loader").fadeOut("fast");
+			});
+        </script>
+    </body>
+</html>
