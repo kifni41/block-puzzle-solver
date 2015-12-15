@@ -64,6 +64,10 @@
         	.tabel-puzzle-result td:hover{
         		background-color: #fcf8e3;
         	}
+
+        	#time-to-solve{
+        		font-style: italic;
+        	}
         </style>
     </head>
     <body>
@@ -341,8 +345,9 @@
             <div class="row" style="text-align:center">
             	<button class="btn btn-lg btn-success" onclick="solveAction()"><span class="glyphicon glyphicon-search"></span> Solve This Puzzle</button>
             </div>
-            <div class="row" style="text-align:center;border:1px dashed #ddd;margin:10px">
-            	<h3>Solutions</h3>
+            <div class="row" id="row-solution" style="text-align:center;border:1px dashed #ddd;margin:10px">
+            	<h4 id="time-to-solve">Time to solve : -</h4>
+            	<h4></h4>
             	<div id="container-solution">
 
             	</div>
@@ -357,25 +362,31 @@
 
 			$(function(){
 				//goal_state = [1,2,3,4,5,6,7,8,0];
-				goal_state 		= [0,1,2,3,4,5,6,7,8];
-				initial_state 	= [3,1,2,6,0,5,7,4,8];
-				//initial_state = [0,2,3,4,6,5,1,7,8];
-				//initial_state = [0,1,3,8,2,5,7,6,4];
+				//goal_state 		= [0,1,2,3,4,5,6,7,8];
+
+				//initial_state 	= [3,1,2,6,0,5,7,4,8];
 				//initial_state = [7,6,2,5,3,1,0,4,8];
+
+				//#var 1
+				goal 		= [1,2,3,8,0,4,7,6,5];
+				//initial 	= [1,3,4,8,6,2,7,0,5]; //easy
+				//initial 	= [2,8,1,0,4,3,7,6,5]; //medium
+				//initial 	= [2,8,1,4,6,3,0,7,5]; //hard
+				//initial = [2, 1, 0, 6, 8, 3, 4, 7, 5]; //harder
+				initial 	= [5,6,7,4,0,8,3,2,1]; //worst
 
 
 				//get all goal input
 				$.each($('.input-goal'),function(idx,item){
 					//set default goal state
-					$(item).val(idx);
+					$(item).val(goal[idx]);
 				});
 				$.each($('.input-initial'),function(idx,item){
 					//set default goal state
-					$(item).val(initial_state[idx]);
+					$(item).val(initial[idx]);
 				});
 
-				//console.log(solveBFS(initial_state, goal_state));
-				//console.log(solveAStar(initial_state, goal_state));
+				$('#row-solution').hide();
 				$(".loader").fadeOut("fast");
 			});
 			function solveAction()
@@ -386,20 +397,21 @@
 					setTimeout(df.resolve,200);
 					return df;					
 				}
-
 				$.doit().done(function(){
 					$.solving = function(){
 						var dfs = $.Deferred();
-						var initial_state = [];
+						initial_state = [];
 						$.each($('.input-initial'),function(idx,item){
 							initial_state.push(parseInt($(item).val()));
 						});
+						console.log(initial_state);
 
-						var goal_state = [];
+						goal_state = [];
 						$.each($('.input-goal'),function(idx,item){
 							goal_state.push(parseInt($(item).val()));
 						});
-
+						console.log(goal_state);
+						//result = solveBFS(initial_state, goal_state);
 						result = solveAStar(initial_state, goal_state);
 						if(result){
 							dfs.resolve();
@@ -407,30 +419,39 @@
 						return dfs;
 					}
 					$.solving().done(function(){
-						states = [];
-						states.push(initial_state);
-						for (var i = 0; i < result.solution.length; i++) {
-							//console.log(result.solution[i]);
-							n_state = moveState(states[states.length-1],result.solution[i]);
-							//console.log(n_state);
-							states.push(n_state);
-							
-						};
-						var actions = result.solution.slice();
-						actions.unshift('start');
-						//console.log(actions);
-						//console.log(states);
-						var html = "";
-						for (var i = 0; i < states.length; i++) {
-							html +="<div class='container-puzlle-result'><h4>"+actions[i] +" (" +i +")" +"</h4>";
-							html +=getPuzzleView(states[i]);
-							html +='</div>';
-							console.log(actions[i]);
-							console.log(states[i]);
-							getPuzzleView(states[i]);
-						};
-						console.log(html);
-						$('#container-solution').html(html);
+						console.log(result);
+						if(result.success){
+							states = [];
+							states.push(initial_state);
+							console.log(states);
+							for (var i = 0; i < result.solution.length; i++) {
+								//console.log(result.solution[i]);
+								n_state = moveState(states[states.length-1],result.solution[i]);
+								//console.log(n_state);
+								states.push(n_state);
+								
+							};
+							var actions = result.solution.slice();
+							actions.unshift('start');
+							//console.log(actions);
+							//console.log(states);
+							var html = "";
+							for (var i = 0; i < states.length; i++) {
+								html +="<div class='container-puzlle-result'><h4>"+actions[i] +" (" +i +")" +"</h4>";
+								html +=getPuzzleView(states[i]);
+								html +='</div>';
+								// console.log(actions[i]);
+								// console.log(states[i]);
+								getPuzzleView(states[i]);
+							};
+							//console.log(html);
+							$('#time-to-solve').html('My A* needs ' +result.solution.length +' moves in ' + result.time +' seconds to solve this puzzle. How about you?' );
+							$('#container-solution').html(html);
+							$('#row-solution').show();
+						}else{
+							alert(result.message);
+						}
+
 						$(".loader").fadeOut("fast");
 
 					});
@@ -448,32 +469,32 @@
 				return table;
 			}
 
-			function moveState(state, dir)
-			{
-				var zero_idx = state.indexOf(0);
-				//console.log('initial= ['+state+']');
-				//console.log('zero_idx='+zero_idx);
-				n_state = state.slice();
-				mod = zero_idx % 3;
-				div = parseInt(zero_idx/3);
-				//console.log('#mod='+mod+'#div='+div);
-				if(dir == 'left' && mod != 0){
-					new_zero = zero_idx - 1;
-				}
-				else if(dir == 'right' && mod !=2){
-					new_zero = zero_idx + 1;
-				}
-				else if(dir == 'up' && div !=0){
-					new_zero = zero_idx - 3;
-				}
-				else if(dir == 'down' && div !=2){
-					new_zero = zero_idx + 3;
-				}else{
-					return null;
-				}
-				n_state = swap(n_state, zero_idx,new_zero );
-				return n_state;
-			}
+			// function moveState(state, dir)
+			// {
+			// 	var zero_idx = state.indexOf(0);
+			// 	//console.log('initial= ['+state+']');
+			// 	//console.log('zero_idx='+zero_idx);
+			// 	n_state = state.slice();
+			// 	mod = zero_idx % 3;
+			// 	div = parseInt(zero_idx/3);
+			// 	//console.log('#mod='+mod+'#div='+div);
+			// 	if(dir == 'left' && mod != 0){
+			// 		new_zero = zero_idx - 1;
+			// 	}
+			// 	else if(dir == 'right' && mod !=2){
+			// 		new_zero = zero_idx + 1;
+			// 	}
+			// 	else if(dir == 'up' && div !=0){
+			// 		new_zero = zero_idx - 3;
+			// 	}
+			// 	else if(dir == 'down' && div !=2){
+			// 		new_zero = zero_idx + 3;
+			// 	}else{
+			// 		return null;
+			// 	}
+			// 	n_state = swap(n_state, zero_idx,new_zero );
+			// 	return n_state;
+			// }
 
 		</script>
     </body>
