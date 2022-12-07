@@ -1,0 +1,17 @@
+{
+    "name": "block-puzzle-solver",
+    "version": "1.0.0",
+    "description": "",
+    "scripts": {
+        "build": "echo \"No build specified\" && exit 1",
+        "test": "echo \"No test specified\" && exit 1",
+        "start": "node index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kifni41/block-puzzle-solver.git"
+    },
+    "author": "kifni",
+    "license": "MIT",
+    "homepage": "https://github.com/kifni41/block-puzzle-solver#readme"
+}
